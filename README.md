@@ -7,4 +7,4 @@
 
 Social Smarts is a Twitter client designed to help small business owners improve their social media interactions. It displays users’ tweets with supplemental data such as Klout scores, geolocation, and response tracking data. Additional features include real- time data updating and timeline searching. 
 
-[Production Site:](http://104.236.107.10/)
+[Production Site](http://104.236.107.10/)
