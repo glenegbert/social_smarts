@@ -40,7 +40,7 @@
       <h1>Schedule a Tweet</h1>
       <input class="tweet_fields" type="text"  ng-model="stweet_message" placeholder="schedule a tweet" required></input>
       <div id="date-time">
-        <input type="date" min="{{defaultDate}}" ng-model="stweet_date"></input>
+        <input type="date" ng-model="stweet_date"></input>
         <input type="time" ng-model="stweet_time"></input>
       </div>
       <input class="button tiny alert" type="submit" ng-click="sendStweet(stweet_message, stweet_time, stweet_date)" ng-disabled="disabled(stweet_message)"></input> Characters: {{length(stweet_message)}}
@@ -60,9 +60,3 @@
     </div>
 </body>
 </html>
-
-
-
-
-
-
