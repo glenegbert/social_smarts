@@ -13,6 +13,12 @@ RSpec.describe User, type: :model do
     expect(@user.oauth_secret).to eq "new secret"
   end
 
+  it "has a Klout score" do
+    VCR.use_cassette('user_klout') do
+      expect(User.klout_score(@user.uid)).to be_a Integer
+    end
+  end
+
   private
 
   def new_auth
