@@ -19,6 +19,12 @@ RSpec.describe User, type: :model do
     end
   end
 
+  it "has a location" do
+    VCR.use_cassette('profile_location') do
+      expect(@user.location[0]).to be_a String
+    end
+  end
+
   private
 
   def new_auth
