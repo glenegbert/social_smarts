@@ -1,9 +1,16 @@
 require 'ostruct'
 
 RSpec.describe Tweet do
-  let(:tweet) { Tweet.new(OpenStruct.new(text: "a tweet",
-                                         user: OpenStruct.new(screen_name: "lukeaiken", id: 6253282),
-                                         created_at: "today")) }
+  let(:tweet)  do
+    Tweet.new(OpenStruct.new(text: "a tweet",
+    user: OpenStruct.new(screen_name: "lukeaiken", id: 6253282, location: "Denver"),
+    created_at: "today"))
+  end
+  let(:tweet2) do
+    Tweet.new(OpenStruct.new(text: "a tweet",
+    user: OpenStruct.new(screen_name: "lukeaiken", id: 6253282, location: Twitter::NullObject.new),
+    created_at: "today"))
+  end
 
   it "has text" do
     expect(tweet.text).to eq "a tweet"
@@ -29,4 +36,25 @@ RSpec.describe Tweet do
       expect(tweet.user_klout_score).to be_a String
     end
   end
+
+  it 'gives a latitude for a tweet' do
+    VCR.use_cassette('geocode') do
+      expect(tweet.latitude_from_profile).to be_a Float
+    end
+  end
+
+  it 'does not give a latitude for a tweet with an undefined user location' do
+    expect(tweet2.latitude_from_profile).to be(nil)
+  end
+
+  it 'gives a longitude for a tweet' do
+    VCR.use_cassette('geocode') do
+      expect(tweet.longitude_from_profile).to be_a Float
+    end
+  end
+
+  it 'does not give a longitude for a tweet with an undefined user location' do
+    expect(tweet2.longitude_from_profile).to be(nil)
+  end
+
 end
