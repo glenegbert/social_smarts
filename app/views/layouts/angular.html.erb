@@ -35,7 +35,7 @@
       <div  data-alert id="messages" class="alert-box alert alert-success" data-ng-show="messages" data-ng-bind="messages"></div>
       <h1>Post a Tweet</h1>
       <input class="tweet_fields" type="text"  ng-model="tweet_message" placeholder="enter tweet" required></input>
-      <input class="button tiny alert" type="submit" ng-click="sendTweet(tweet_message)" ng-disabled="disabled(tweet_message)"></input> Charaters: {{length(tweet_message)}}
+      <input class="button tiny alert" type="submit" ng-click="sendTweet(tweet_message)" ng-disabled="disabled(tweet_message)"></input> Characters: {{length(tweet_message)}}
 
       <h1>Schedule a Tweet</h1>
       <input class="tweet_fields" type="text"  ng-model="stweet_message" placeholder="schedule a tweet" required></input>

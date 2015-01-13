@@ -23,13 +23,11 @@ class Tweet
   end
 
   def latitude_from_profile
-    parser = LocationDataParser.new(tweet)
-    parser.coordinate_from_profile("lat")
+    LocationDataParser.new(tweet).coordinate_from_profile("lat")
   end
 
   def longitude_from_profile
-    parser = LocationDataParser.new(tweet)
-    parser.coordinate_from_profile("lng")
+    LocationDataParser.new(tweet).coordinate_from_profile("lng")
   end
 
 end
@@ -40,29 +38,37 @@ class LocationDataParser
     @tweet = tweet
   end
 
-  def location_data
-    unless location_missing?
-      Faraday.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + @tweet.user.location + '&key=' + 'AIzaSyCkCtk5jlm5ZiT47hqEsqVlQ5u97k7my4A')
-    end
+  def geolocation_json
+    Faraday.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + profile_location + '&key=' + 'AIzaSyCkCtk5jlm5ZiT47hqEsqVlQ5u97k7my4A')
   end
 
-  def parsed_location_data
-    JSON.parse(location_data.body) if location_data
+  def profile_location
+    @tweet.user.location
+  end
+
+  def parsed_geolocation_json
+    JSON.parse(geolocation_json.body)
   end
 
   def coordinate_from_profile(lat_lng)
-    unless location_missing?
-      if cached_coordinates?
-        cached_coordinate(lat_lng) + offset(0.01, 0.05)
-      elsif geocode_exists_for_profile_location?
-        Rails.cache.write(profile_location, coordinates)
-        coordinates[lat_lng] + offset(0.01, 0.05)
-      end
+    get_coordinate(lat_lng) unless no_profile_location?
+  end
+
+  def get_coordinate(lat_lng)
+    if cached_coordinates?
+      cached_coordinates(lat_lng) + offset(0.01, 0.05)
+    elsif geocode_exists_for_profile_location?
+      cache_coordinates
+      coordinates_from_json[lat_lng] + offset(0.01, 0.05)
     end
   end
 
-  def coordinates
-    parsed_location_data["results"][0]["geometry"]["location"]
+  def cache_coordinates
+    Rails.cache.write(profile_location, coordinates_from_json)
+  end
+
+  def coordinates_from_json
+    parsed_geolocation_json["results"][0]["geometry"]["location"]
   end
 
   def profile_location
@@ -70,19 +76,19 @@ class LocationDataParser
   end
 
   def geocode_exists_for_profile_location?
-    parsed_location_data["results"] != []
+    parsed_geolocation_json["results"] != []
   end
 
   def cached_coordinates?
     Rails.cache.read(@tweet.user.location)
   end
 
-  def cached_coordinate(lat_lng)
+  def cached_coordinates(lat_lng)
     Rails.cache.read(@tweet.user.location)[lat_lng]
   end
 
-  def location_missing?
-    @tweet.user.location.instance_of?(Twitter::NullObject)
+  def no_profile_location?
+    profile_location.instance_of?(Twitter::NullObject)
   end
 
   def offset (min, max)
@@ -90,3 +96,6 @@ class LocationDataParser
   end
 
 end
+
+#where does extra class go?
+#what about testing caching?
